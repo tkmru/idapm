@@ -24,3 +24,6 @@ def install(dir_name):
                 print('Copy to {0} from {1}'.format(plugin_file_path, py_file_path))
             
             print(Fore.CYAN + 'Installed successfully!')
+
+    else:
+        print('Your OS is unsupported...')

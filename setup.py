@@ -2,16 +2,18 @@
 # coding: UTF-8
 
 from setuptools import setup
+import idapm
+
 
 setup(
-    name="ida-plugin-installer",
+    name="idapm",
     version="0.0.1",
-    description="installer for IDA plugin",
+    description="IDA Plugin Manager",
     author="tkmru",
-    packages=['installer'],
+    packages=['idapm'],
     entry_points={
         'console_scripts': [
-            'idai = installer.cli:main',
+            'idapm = idapm.cli:main',
         ],
     },
     install_requires=[
