@@ -19,9 +19,9 @@ setup(
     install_requires=[
         'colorama',
     ],
-    license='MIT',
+    license='GPLv3',
     classifiers=[
-        'License :: OSI Approved :: MIT License',
+        'OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
     ],
