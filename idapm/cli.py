@@ -3,6 +3,7 @@
 
 import argparse
 import colorama
+import json
 import os
 
 from colorama import Fore
@@ -12,11 +13,17 @@ from . import installer
 def cmd_init(args):
     home_dir = os.environ['HOME']
     config_path = home_dir + '/idapm.json'
-    if not os.path.isfile('~/idapm.json'):
-        config_list = ["{",  "  plugins: []", "}"]
+    if not os.path.isfile(config_path):
+        config_list = ['{',  '  "plugins": []', '}']
         with open(config_path, 'w') as f:
             f.write("\n".join(config_list))
         print(Fore.CYAN + '~/idapm.json was created successfully')
+    else:
+        with open(config_path, 'r') as f:
+            config_json = json.load(f)
+            plugin_repos = config_json['plugins']    
+            for plugin in plugin_repos:
+                installer.install_from_github(plugin) 
 
 
 def cmd_install(args):

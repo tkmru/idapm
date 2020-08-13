@@ -2,35 +2,62 @@
 # coding: UTF-8
 
 import glob
+import json
 import os
 import platform
+import shlex
 import shutil
+import subprocess
 
 from colorama import Fore
 
 
-def install_from_local(dir_name):
+def check_plugin_dir():
     if platform.system() == 'Darwin':
         ida_root_list = glob.glob('/Applications/IDA*')
         if len(ida_root_list) == 1:
             ida_root_path = ida_root_list[0]
             ida_plugins_path = os.path.join(ida_root_path, 'ida.app/Contents/MacOS/plugins')
-            py_file_list = glob.glob(os.path.join(dir_name, '*.py'))
-            # TODO: Improved the accuracy of searching Python files
-            for py_file_path in py_file_list:
-                py_file_name = os.path.basename(py_file_path)
-                plugin_file_path = os.path.join(ida_plugins_path, py_file_name)
-                shutil.copyfile(py_file_path, plugin_file_path)
-                print('Copy to {0} from {1}'.format(plugin_file_path, py_file_path))
-            
-            print(Fore.CYAN + 'Installed successfully!')
+            return ida_plugins_path
+
+    return None
+
+
+def install_from_local(dir_name):
+    ida_plugins_path = check_plugin_dir()
+    if ida_plugins_path is not None:
+        py_file_list = glob.glob(os.path.join(dir_name, '*.py'))
+        for py_file_path in py_file_list:
+            py_file_name = os.path.basename(py_file_path)
+            plugin_file_path = os.path.join(ida_plugins_path, py_file_name)
+            shutil.copyfile(py_file_path, plugin_file_path)
+            print('Copy to {0} from {1}'.format(plugin_file_path, py_file_path))
+        
+        print(Fore.CYAN + 'Installed successfully!')
 
     else:
         print(Fore.RED + 'Your OS is unsupported...')
 
-'''
-def install_from_github(dir_name):
-'''
+
+def install_from_github(repo_name):
+    ida_plugins_path = check_plugin_dir()
+    if ida_plugins_path is not None:
+        repo_name = shlex.quote(repo_name) # Countermeasures for command injection
+        repo_url = 'git@github.com:{0}.git'.format(repo_name)
+        installed_path = os.path.join(ida_plugins_path, 'idapm', repo_name)
+        proc = subprocess.Popen(['git', 'clone', repo_url, installed_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        outs, errs = proc.communicate()
+        if (outs is not None) and (len(outs) != 0):
+            print(outs.decode('ascii'))
+        
+        if (errs is not None) and (len(errs) != 0):
+            print(errs.decode('ascii'))
+
+        print(Fore.CYAN + 'Installed successfully!')
+
+    else:
+        print(Fore.RED + 'Your OS is unsupported...')
+
 
 def list_plugins():
     if platform.system() == 'Darwin':
@@ -62,5 +89,16 @@ def list_plugins():
                     print(plugin)
 
             print(Fore.CYAN + '\nList of files in config')
+            home_dir = os.environ['HOME']
+            config_path = home_dir + '/idapm.json'
+            with open(config_path, 'r') as f:
+                config_json = json.load(f)
+                plugin_repos = config_json['plugins']
+                if len(plugin_repos) == 0:
+                    print('None')
+                else:
+                    for plugin in plugin_repos:
+                        print(plugin)
+
     else:
         print('Your OS is unsupported...')
