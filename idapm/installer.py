@@ -8,28 +8,29 @@ import platform
 import shlex
 import shutil
 import subprocess
+from pathlib import Path
 
 from colorama import Fore
 
 
-def check_plugin_dir():
+def get_plugin_dir():
     if platform.system() == 'Darwin':
         ida_root_list = glob.glob('/Applications/IDA*')
         if len(ida_root_list) == 1:
             ida_root_path = ida_root_list[0]
-            ida_plugins_path = os.path.join(ida_root_path, 'ida.app/Contents/MacOS/plugins')
-            return ida_plugins_path
+            ida_plugins_dir = os.path.join(ida_root_path, 'ida.app/Contents/MacOS/plugins')
+            return ida_plugins_dir
 
     return None
 
 
 def install_from_local(dir_name):
-    ida_plugins_path = check_plugin_dir()
-    if ida_plugins_path is not None:
+    ida_plugins_dir = get_plugin_dir()
+    if ida_plugins_dir is not None:
         py_file_list = glob.glob(os.path.join(dir_name, '*.py'))
         for py_file_path in py_file_list:
             py_file_name = os.path.basename(py_file_path)
-            plugin_file_path = os.path.join(ida_plugins_path, py_file_name)
+            plugin_file_path = os.path.join(ida_plugins_dir, py_file_name)
             shutil.copyfile(py_file_path, plugin_file_path)
             print('Copy to {0} from {1}'.format(plugin_file_path, py_file_path))
         
@@ -40,11 +41,14 @@ def install_from_local(dir_name):
 
 
 def install_from_github(repo_name):
-    ida_plugins_path = check_plugin_dir()
-    if ida_plugins_path is not None:
+    '''
+    After git clone plugin in ida_plugins_dir/idapm, and create a symbolic link to the python file from ida_plugins_dir
+    '''
+    ida_plugins_dir = get_plugin_dir()
+    if ida_plugins_dir is not None:
         repo_name = shlex.quote(repo_name) # Countermeasures for command injection
         repo_url = 'git@github.com:{0}.git'.format(repo_name)
-        installed_path = os.path.join(ida_plugins_path, 'idapm', repo_name)
+        installed_path = os.path.join(ida_plugins_dir, 'idapm', repo_name)
         proc = subprocess.Popen(['git', 'clone', repo_url, installed_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         outs, errs = proc.communicate()
         if (outs is not None) and (len(outs) != 0):
@@ -52,6 +56,16 @@ def install_from_github(repo_name):
         
         if (errs is not None) and (len(errs) != 0):
             print(errs.decode('ascii'))
+
+        py_file_list = glob.glob(os.path.join(installed_path, '*.py'))
+        for py_file_path in py_file_list:
+            p = Path(py_file_path)
+            symlink_path = os.path.join(ida_plugins_dir, p.parts[-1])
+            if not os.path.exists(symlink_path):
+                parent_dir = str(p.parent)
+                if (len(p.parts) > 1) and (not os.path.exists(parent_dir)):
+                    os.makedirs(parent_dir)
+                os.symlink(py_file_path, os.path.join(ida_plugins_dir, symlink_path))
 
         print(Fore.CYAN + 'Installed successfully!')
 
@@ -79,8 +93,8 @@ def list_plugins():
         ida_root_list = glob.glob('/Applications/IDA*')
         if len(ida_root_list) == 1:
             ida_root_path = ida_root_list[0]
-            ida_plugins_path = os.path.join(ida_root_path, 'ida.app/Contents/MacOS/plugins')
-            added_plugins = set(os.listdir(ida_plugins_path)) - exclude_files
+            ida_plugins_dir = os.path.join(ida_root_path, 'ida.app/Contents/MacOS/plugins')
+            added_plugins = set(os.listdir(ida_plugins_dir)) - exclude_files
             print(Fore.CYAN + 'List of files in IDA plugin directory')
             if len(added_plugins) == 0:
                 print('None')
