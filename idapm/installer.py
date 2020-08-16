@@ -106,7 +106,8 @@ def list_plugins():
             print(Fore.CYAN + '\nList of files in config')
             home_dir = os.environ['HOME']
             config_path = home_dir + '/idapm.json'
-            plugin_repos = config.list_plugins()
+            c = config.Config()
+            plugin_repos = c.list_plugins()
             if len(plugin_repos) == 0:
                 print('None')
             else:

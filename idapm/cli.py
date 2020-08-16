@@ -6,19 +6,29 @@ import colorama
 import json
 import os
 
-from . import config
 from . import installer
+from . import config
 from colorama import Fore
 
 
+def cmd_check(args):
+    print('IDA plugin dir:    {0}'.format(installer.get_plugin_dir()))
+    c = config.Config()
+    print('idapm config path: {0}'.format(c.config_path))
+
+
 def cmd_init(args):
-    if not config.check_exists():
-        config_list = ['{',  '  "plugins": []', '}']
-        with open(config_path, 'w') as f:
-            f.write("\n".join(config_list))
-        print(Fore.CYAN + '~/idapm.json was created successfully')
+    c = config.Config()
+    if not c.check_exists():
+        try:
+            c.make_config()
+            print(Fore.CYAN + '~/idapm.json was created successfully!')
+
+        except:
+            print(Fore.RED + 'Creation of ~/idapm.json failed')
+
     else:
-        plugin_repos = config.list_plugins()
+        plugin_repos = c.list_plugins()
         for plugin in plugin_repos:
             installer.install_from_github(plugin) 
 
@@ -27,8 +37,11 @@ def cmd_install(args):
     if args.local:
         installer.install_from_local(args.plugin_name)
     else:
-        if config.add_plugin(args.plugin_name):
+        c = config.Config()
+        if c.add_plugin(args.plugin_name):
             installer.install_from_github(args.plugin_name) 
+        else:
+            print(Fore.RED + '{0} already exists'.format(args.plugin_name))
 
 
 def cmd_list(args):
@@ -39,6 +52,9 @@ def main():
     colorama.init(autoreset=True)
     parser = argparse.ArgumentParser(description='IDA Plugin Manager')
     subparsers = parser.add_subparsers()
+
+    parser_check = subparsers.add_parser('check', help='')
+    parser_check.set_defaults(handler=cmd_check)
 
     parser_init = subparsers.add_parser('init', help='')
     parser_init.set_defaults(handler=cmd_init)
