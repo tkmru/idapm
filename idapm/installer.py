@@ -8,8 +8,9 @@ import platform
 import shlex
 import shutil
 import subprocess
-from pathlib import Path
 
+from . import config
+from pathlib import Path
 from colorama import Fore
 
 
@@ -105,14 +106,12 @@ def list_plugins():
             print(Fore.CYAN + '\nList of files in config')
             home_dir = os.environ['HOME']
             config_path = home_dir + '/idapm.json'
-            with open(config_path, 'r') as f:
-                config_json = json.load(f)
-                plugin_repos = config_json['plugins']
-                if len(plugin_repos) == 0:
-                    print('None')
-                else:
-                    for plugin in plugin_repos:
-                        print(plugin)
+            plugin_repos = config.list_plugins()
+            if len(plugin_repos) == 0:
+                print('None')
+            else:
+                for plugin in plugin_repos:
+                    print(plugin)
 
     else:
         print('Your OS is unsupported...')

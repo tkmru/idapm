@@ -6,31 +6,29 @@ import colorama
 import json
 import os
 
-from colorama import Fore
+from . import config
 from . import installer
+from colorama import Fore
 
 
 def cmd_init(args):
-    home_dir = os.environ['HOME']
-    config_path = home_dir + '/idapm.json'
-    if not os.path.isfile(config_path):
+    if not config.check_exists():
         config_list = ['{',  '  "plugins": []', '}']
         with open(config_path, 'w') as f:
             f.write("\n".join(config_list))
         print(Fore.CYAN + '~/idapm.json was created successfully')
     else:
-        with open(config_path, 'r') as f:
-            config_json = json.load(f)
-            plugin_repos = config_json['plugins']    
-            for plugin in plugin_repos:
-                installer.install_from_github(plugin) 
+        plugin_repos = config.list_plugins()
+        for plugin in plugin_repos:
+            installer.install_from_github(plugin) 
 
 
 def cmd_install(args):
     if args.local:
-        installer.install_from_local(args.dir_name)
+        installer.install_from_local(args.plugin_name)
     else:
-        installer.install_from_github(args.repo_name) 
+        if config.add_plugin(args.plugin_name):
+            installer.install_from_github(args.plugin_name) 
 
 
 def cmd_list(args):
@@ -46,7 +44,7 @@ def main():
     parser_init.set_defaults(handler=cmd_init)
 
     parser_install = subparsers.add_parser('install', aliases=['i'], help='')
-    parser_install.add_argument('dir_name', help='')
+    parser_install.add_argument('plugin_name', help='')
     parser_install.add_argument('--local', '-l', action='store_true')
     parser_install.set_defaults(handler=cmd_install)
 
