@@ -30,6 +30,7 @@ def cmd_init(args):
     else:
         plugin_repos = c.list_plugins()
         for plugin in plugin_repos:
+            print('----------------------')
             installer.install_from_github(plugin) 
 
 
@@ -38,8 +39,10 @@ def cmd_install(args):
         installer.install_from_local(args.plugin_name)
     else:
         c = config.Config()
-        if c.add_plugin(args.plugin_name):
-            installer.install_from_github(args.plugin_name) 
+        if not c.check_duplicate(args.plugin_name):
+            print('----------------------')
+            if installer.install_from_github(args.plugin_name):
+                c.add_plugin(args.plugin_name)
         else:
             print(Fore.RED + '{0} already exists'.format(args.plugin_name))
 

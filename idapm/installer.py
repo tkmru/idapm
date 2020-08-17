@@ -53,10 +53,14 @@ def install_from_github(repo_name):
         proc = subprocess.Popen(['git', 'clone', repo_url, installed_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         outs, errs = proc.communicate()
         if (outs is not None) and (len(outs) != 0):
-            print(outs.decode('ascii'))
+            msg = outs.decode('ascii').replace('\n', '')
+            print(msg)
         
         if (errs is not None) and (len(errs) != 0):
-            print(errs.decode('ascii'))
+            msg = errs.decode('ascii').replace('\n', '')
+            print(msg)
+            if 'Repository not found' in msg:
+                return False
 
         py_file_list = glob.glob(os.path.join(installed_path, '*.py'))
         for py_file_path in py_file_list:
@@ -67,11 +71,14 @@ def install_from_github(repo_name):
                 if (len(p.parts) > 1) and (not os.path.exists(parent_dir)):
                     os.makedirs(parent_dir)
                 os.symlink(py_file_path, os.path.join(ida_plugins_dir, symlink_path))
+                print('Symbolic link has been created ({0})'.format(symlink_path))
 
         print(Fore.CYAN + 'Installed successfully!')
+        return True
 
     else:
         print(Fore.RED + 'Your OS is unsupported...')
+        return False
 
 
 def list_plugins():
@@ -89,23 +96,22 @@ def list_plugins():
             'xnu_user64.dylib', 'comhelper.dylib', 'dwarf.dylib', 'callee.dylib', 'dalvik_user.dylib', 'bdescr.dylib', 
             'linux_stub64.dylib', 'armlinux_stub.dylib', 'replay_user64.dylib', 'dwarf64.dylib', 'gdb_user.dylib', 
             'bochs_user64.dylib', 'win32_stub64.dylib', 'armlinux_stub64.dylib', 'ios_user.dylib', 'rtti.dylib', 
-            'bochs', 'win32_stub.dylib', 'swift.dylib', 'svdimport64.dylib', 'bdescr64.dylib', 'makeidt64.dylib'
+            'bochs', 'win32_stub.dylib', 'swift.dylib', 'svdimport64.dylib', 'bdescr64.dylib', 'makeidt64.dylib',
+            'idapm'
         }
         ida_root_list = glob.glob('/Applications/IDA*')
         if len(ida_root_list) == 1:
             ida_root_path = ida_root_list[0]
             ida_plugins_dir = os.path.join(ida_root_path, 'ida.app/Contents/MacOS/plugins')
             added_plugins = set(os.listdir(ida_plugins_dir)) - exclude_files
-            print(Fore.CYAN + 'List of files in IDA plugin directory')
+            print(Fore.CYAN + 'List of scripts in IDA plugin directory')
             if len(added_plugins) == 0:
                 print('None')
             else:
                 for plugin in added_plugins:
                     print(plugin)
 
-            print(Fore.CYAN + '\nList of files in config')
-            home_dir = os.environ['HOME']
-            config_path = home_dir + '/idapm.json'
+            print(Fore.CYAN + '\nList of plugins in config')
             c = config.Config()
             plugin_repos = c.list_plugins()
             if len(plugin_repos) == 0:
