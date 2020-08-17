@@ -17,20 +17,39 @@ $ pip install git+ssh://git@github.com/tkmru/idapm.git
 
 ### init
 
+Executing `init` command creates `~/idapm.json`. 
+It contains information about the plugins you have installed.
+
 ```
 $ idapm init
 ~/idapm.json was created successfully!
 ```
 
-### install
+If `~/idapm.json` already exists, you can install the plugins listed in `~/idapm.json`.
 
 ```
-$ idapm install L4ys/LazyIDA
+~/idapm.json already exists...
+Do you want to install a plugin written in ~/idapm.json? [Y/n]: y
 ----------------------
 Cloning into '/Applications/IDA Pro 7.5/ida.app/Contents/MacOS/plugins/idapm/L4ys/LazyIDA'...
 Symbolic link(/Applications/IDA Pro 7.5/ida.app/Contents/MacOS/plugins/LazyIDA.py) has been created
 Installed successfully!
 ```
+
+### install
+#### from GitHub
+
+You can install from the specified GitHub repository.
+
+```
+$ idapm install L4ys/LazyIDA
+----------------------
+Cloning into '/Applications/IDA Pro 7.5/ida.app/Contents/MacOS/plugins/idapm/L4ys/LazyIDA'...
+Symbolic link(/Applications/IDA Pro 7.5/ida.app/Contents/MacOS/plugins/LazyIDA.py) has been created.
+Installed successfully!
+```
+
+The installed plug-ins are marked in the config.
 
 ```
 $ cat /Users/tkmru/idapm.json
@@ -40,6 +59,10 @@ $ cat /Users/tkmru/idapm.json
   ]
 }
 ```
+
+#### from local
+
+You can copy a Python script from the specified directory.
 
 ```
 $ idapm install --local ./

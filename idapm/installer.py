@@ -71,7 +71,7 @@ def install_from_github(repo_name):
                 if (len(p.parts) > 1) and (not os.path.exists(parent_dir)):
                     os.makedirs(parent_dir)
                 os.symlink(py_file_path, os.path.join(ida_plugins_dir, symlink_path))
-                print('Symbolic link has been created ({0})'.format(symlink_path))
+                print('Symbolic link has been created ({0}).'.format(symlink_path))
 
         print(Fore.CYAN + 'Installed successfully!')
         return True

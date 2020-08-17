@@ -25,13 +25,23 @@ def cmd_init(args):
             print(Fore.CYAN + '~/idapm.json was created successfully!')
 
         except:
-            print(Fore.RED + 'Creation of ~/idapm.json failed')
+            print(Fore.RED + 'Creation of ~/idapm.json failed...')
 
     else:
-        plugin_repos = c.list_plugins()
-        for plugin in plugin_repos:
-            print('----------------------')
-            installer.install_from_github(plugin) 
+        print('~/idapm.json already exists...')
+        while True:
+            input_pattern = {'y': True, 'yes': True, 'n': False, 'no': False}
+            try:
+                key = input('Do you want to install a plugin written in ~/idapm.json? [Y/n]: ').lower()
+                if input_pattern[key]:
+                    plugin_repos = c.list_plugins()
+                    for plugin in plugin_repos:
+                        print('----------------------')
+                        installer.install_from_github(plugin) 
+                break
+
+            except:
+                pass
 
 
 def cmd_install(args):
