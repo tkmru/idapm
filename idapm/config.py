@@ -4,11 +4,13 @@
 import json
 import os
 
+from os.path import expanduser
+
 
 class Config(object):
 
     def __init__(self):
-        home_dir = os.environ['HOME']
+        home_dir = expanduser("~")
         self.config_path = home_dir + '/idapm.json'
 
     def check_duplicate(self, plugin_repo):

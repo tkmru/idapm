@@ -17,7 +17,7 @@ $ pip install git+ssh://git@github.com/tkmru/idapm.git
 
 ### init
 
-Executing `init` command creates `~/idapm.json`. 
+`init` command creates `~/idapm.json`. 
 It contains information about the plugins you have installed.
 
 ```
@@ -28,6 +28,7 @@ $ idapm init
 If `~/idapm.json` already exists, you can install the plugins listed in `~/idapm.json`.
 
 ```
+$ idapm init
 ~/idapm.json already exists...
 Do you want to install a plugin written in ~/idapm.json? [Y/n]: y
 ----------------------
@@ -37,6 +38,9 @@ Installed successfully!
 ```
 
 ### install
+
+`install` command install plugin from GitHub repository or local.
+
 #### from GitHub
 
 You can install from the specified GitHub repository.
@@ -71,6 +75,8 @@ Installed successfully!
 ```
 
 ### list
+
+`list` command displays a list of installed plugins.
 
 ```
 $ idapm list
