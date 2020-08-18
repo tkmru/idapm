@@ -37,7 +37,7 @@ def cmd_init(args):
                     plugin_repos = c.list_plugins()
                     for plugin in plugin_repos:
                         print('----------------------')
-                        installer.install_from_github(plugin) 
+                        installer.install_from_github(plugin)
                 break
 
             except:

@@ -4,7 +4,6 @@
 from setuptools import setup
 import idapm
 
-
 setup(
     name="idapm",
     version="0.0.1",

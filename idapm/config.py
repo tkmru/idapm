@@ -10,13 +10,13 @@ class Config(object):
     def __init__(self):
         home_dir = os.environ['HOME']
         self.config_path = home_dir + '/idapm.json'
-    
+
     def check_duplicate(self, plugin_repo):
         with open(self.config_path, 'r+') as f:
             config_json = json.load(f)
             if plugin_repo not in config_json['plugins']:
                 return False
-            
+
             return True
 
     def check_exists(self):
