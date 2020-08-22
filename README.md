@@ -59,6 +59,7 @@ The installed plug-ins are marked in the config.
 $ cat /Users/tkmru/idapm.json
 {
   "plugins": [
+    "keystone-engine/keypatch",
     "L4ys/LazyIDA"
   ]
 }

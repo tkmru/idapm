@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding: UTF-8
 
+import copy
 import glob
 import json
 import os
@@ -10,7 +11,6 @@ import shutil
 import subprocess
 
 from . import config
-from pathlib import Path
 from colorama import Fore
 
 
@@ -25,20 +25,38 @@ def get_plugin_dir():
     return None
 
 
+def get_top_py_dir(py_path_list, ida_plugins_dir):
+    result_dir = '.'
+    flag = False
+    for py_path in py_path_list:
+        p = py_path.replace(ida_plugins_dir, '').split('/')[3:]
+        if len(p) == 2:
+            flag = True
+        else:
+            if (p[1] != 'test') and (p[1] != 'tests'):
+                result_dir = p[1]
+    
+    if flag:
+        return None
+    else:
+        return result_dir
+
+
 def install_from_local(dir_name):
     ida_plugins_dir = get_plugin_dir()
-    if ida_plugins_dir is not None:
-        py_file_list = glob.glob(os.path.join(dir_name, '*.py'))
-        for py_file_path in py_file_list:
-            py_file_name = os.path.basename(py_file_path)
-            plugin_file_path = os.path.join(ida_plugins_dir, py_file_name)
-            shutil.copyfile(py_file_path, plugin_file_path)
-            print('Copy to {0} from {1}'.format(plugin_file_path, py_file_path))
-
-        print(Fore.CYAN + 'Installed successfully!')
-
-    else:
+    if ida_plugins_dir is None:
         print(Fore.RED + 'Your OS is unsupported...')
+        return False
+    
+    py_file_list = glob.glob(os.path.join(dir_name, '**/*.py'), recursive=True)
+    for py_file_path in py_file_list:
+        py_file_name = os.path.basename(py_file_path)
+        plugin_file_path = os.path.join(ida_plugins_dir, py_file_name)
+        shutil.copyfile(py_file_path, plugin_file_path)
+        print('Copy to {0} from {1}'.format(plugin_file_path, py_file_path))
+
+    print(Fore.CYAN + 'Installed successfully!')
+    return True
 
 
 def install_from_github(repo_name):
@@ -63,16 +81,23 @@ def install_from_github(repo_name):
             if 'Repository not found' in msg:
                 return False
 
-        py_file_list = glob.glob(os.path.join(installed_path, '*.py'))
+        py_file_list = glob.glob(os.path.join(installed_path, '**/*.py'), recursive=True)
+        top_dir = get_top_py_dir(py_file_list, ida_plugins_dir)
         for py_file_path in py_file_list:
-            p = Path(py_file_path)
-            symlink_path = os.path.join(ida_plugins_dir, p.parts[-1])
-            if not os.path.exists(symlink_path):
-                parent_dir = str(p.parent)
-                if (len(p.parts) > 1) and (not os.path.exists(parent_dir)):
-                    os.makedirs(parent_dir)
-                os.symlink(py_file_path, os.path.join(ida_plugins_dir, symlink_path))
-                print('Symbolic link has been created ({0}).'.format(symlink_path))
+            py_file_name = os.path.basename(py_file_path)
+            symlink_dir = os.path.dirname(py_file_path)
+            symlink_dir_list = symlink_dir.split('/')
+            if (symlink_dir_list[-1] != 'test') and (symlink_dir_list[-1] != 'tests'):
+                symlink_dir = symlink_dir.replace('/'+repo_name, '').replace('/idapm', '')
+                if top_dir is not None:
+                   symlink_dir = symlink_dir.replace('/'+top_dir, '')
+                symlink_path = os.path.join(symlink_dir, py_file_name)
+                if not os.path.exists(symlink_path):
+                    parent_dir = os.path.dirname(py_file_path)
+                    if not os.path.exists(parent_dir):
+                        os.makedirs(parent_dir)
+                    os.symlink(py_file_path, symlink_path)
+                    print('Symbolic link has been created ({0}).'.format(symlink_path))
 
         print(Fore.CYAN + 'Installed successfully!')
         return True
