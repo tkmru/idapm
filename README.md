@@ -2,6 +2,8 @@
 
 `idapm` is IDA Plugin Manager. It still only works on macOS.
 
+<img src="screenshots/terminal.gif">
+
 ## Motivation
 
 Managing the IDA Plugin is inconvenient. There is no official package manager and you have to copy files to the plugin directory manually. 
