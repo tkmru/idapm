@@ -120,7 +120,8 @@ def install_from_github(repo_name, repo_url):
 
 
 def list_plugins():
-    if platform.system() == 'Darwin':
+    platform_name = platform.system()
+    if platform_name == 'Darwin':
         exclude_files = {
             'hexarm64.dylib', 'svdimport.dylib', 'dbg.dylib', 'pdb.dylib', 'callee64.dylib',
             'objc64.dylib', 'pdb64.dylib', 'tds.dylib', 'defs.h', 'mac_stub.dylib', 'idapython3.dylib',
@@ -141,6 +142,36 @@ def list_plugins():
         if len(ida_root_list) == 1:
             ida_root_path = ida_root_list[0]
             ida_plugins_dir = os.path.join(ida_root_path, 'ida.app/Contents/MacOS/plugins')
+            added_plugins = set(os.listdir(ida_plugins_dir)) - exclude_files
+            print(Fore.CYAN + 'List of scripts in IDA plugin directory')
+            if len(added_plugins) == 0:
+                print('None')
+            else:
+                for plugin in added_plugins:
+                    print(plugin)
+
+            print(Fore.CYAN + '\nList of plugins in config')
+            c = config.Config()
+            plugin_repos = c.list_plugins()
+            if len(plugin_repos) == 0:
+                print('None')
+            else:
+                for plugin in plugin_repos:
+                    print(plugin)
+
+    elif platform_name == 'Windows':
+        exclude_files = {
+            'bdescr64.dll', 'dbg64.dll', 'dwarf64.dll', 'objc64.dll', 'pdb64.dll', 
+            'plugins.cfg', 'tds64.dll', 'win32_user64.dll', 'idapm'
+        }
+        ida_dir_list = ['C:\Program Files\IDA*', 'C:\Program Files (x86)\IDA*']
+        ida_root_list = []
+        for ida_dir in ida_dir_list:
+            ida_root_list.extend(glob.glob(ida_dir))
+
+        if len(ida_root_list) == 1:
+            ida_root_path = ida_root_list[0]
+            ida_plugins_dir = os.path.join(ida_root_path, 'plugins')
             added_plugins = set(os.listdir(ida_plugins_dir)) - exclude_files
             print(Fore.CYAN + 'List of scripts in IDA plugin directory')
             if len(added_plugins) == 0:
