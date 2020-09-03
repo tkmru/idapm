@@ -15,12 +15,24 @@ from colorama import Fore
 
 
 def get_plugin_dir():
-    if platform.system() == 'Darwin':
+    platform_name = platform.system()
+    if platform_name == 'Darwin':
         ida_root_list = glob.glob('/Applications/IDA*')
         if len(ida_root_list) == 1:
             ida_root_path = ida_root_list[0]
             ida_plugins_dir = os.path.join(ida_root_path, 'ida.app/Contents/MacOS/plugins')
             return ida_plugins_dir
+
+    elif platform_name == 'Windows':
+        ida_dir_list = ['C:\Program Files\IDA*', 'C:\Program Files (x86)\IDA*']
+        ida_root_list = []
+
+        for ida_dir in ida_dir_list:
+            ida_root_list.extend(glob.glob(ida_dir))
+            if len(ida_root_list) == 1:
+                ida_root_path = ida_root_list[0]
+                ida_plugins_dir = os.path.join(ida_root_path, 'plugins')
+                return ida_plugins_dir
 
     return None
 
@@ -29,7 +41,7 @@ def get_top_py_dir(py_path_list, ida_plugins_dir):
     result_dir = '.'
     flag = False
     for py_path in py_path_list:
-        p = py_path.replace(ida_plugins_dir, '').split('/')[3:]
+        p = py_path.replace(ida_plugins_dir, '').replace('\\', '/').split('/')[3:]
         if len(p) == 2:
             flag = True
         else:
@@ -59,14 +71,13 @@ def install_from_local(dir_name):
     return True
 
 
-def install_from_github(repo_name):
+def install_from_github(repo_name, repo_url):
     '''
     After git clone plugin in ida_plugins_dir/idapm, and create a symbolic link to the python file from ida_plugins_dir
     '''
     ida_plugins_dir = get_plugin_dir()
     if ida_plugins_dir is not None:
         repo_name = shlex.quote(repo_name)  # Countermeasures for command injection
-        repo_url = 'git@github.com:{0}.git'.format(repo_name)
         installed_path = os.path.join(ida_plugins_dir, 'idapm', repo_name)
         proc = subprocess.Popen(['git', 'clone', repo_url, installed_path], stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE)
@@ -84,6 +95,7 @@ def install_from_github(repo_name):
         py_file_list = glob.glob(os.path.join(installed_path, '**/*.py'), recursive=True)
         top_dir = get_top_py_dir(py_file_list, ida_plugins_dir)
         for py_file_path in py_file_list:
+            py_file_path = py_file_path.replace('\\', '/')
             py_file_name = os.path.basename(py_file_path)
             symlink_dir = os.path.dirname(py_file_path)
             symlink_dir_list = symlink_dir.split('/')

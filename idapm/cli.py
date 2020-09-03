@@ -37,7 +37,13 @@ def cmd_init(args):
                     plugin_repos = c.list_plugins()
                     for plugin in plugin_repos:
                         print('----------------------')
-                        installer.install_from_github(plugin)
+                        try:
+                            repo_url = 'https://github.com/{0}.git'.format(repo_name)
+                            installer.install_from_github(plugin, repo_url)
+
+                        except:
+                            repo_url = 'git@github.com:{0}.git'.format(repo_name)
+                            installer.install_from_github(plugin, repo_url)
                 break
 
             except:
@@ -51,8 +57,15 @@ def cmd_install(args):
         c = config.Config()
         if not c.check_duplicate(args.plugin_name):
             print('----------------------')
-            if installer.install_from_github(args.plugin_name):
+            repo_https_url = 'https://github.com/{0}.git'.format(args.plugin_name)
+            if installer.install_from_github(args.plugin_name, repo_https_url):
                 c.add_plugin(args.plugin_name)
+
+            else:
+                repo_ssh_url = 'git@github.com:{0}.git'.format(args.plugin_name)
+                if installer.install_from_github(args.plugin_name, repo_ssh_url):
+                    c.add_plugin(args.plugin_name)
+
         else:
             print(Fore.RED + '{0} already exists'.format(args.plugin_name))
 
