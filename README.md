@@ -1,6 +1,7 @@
 # idapm
 
-`idapm` is IDA Plugin Manager. It works perfectly on macOS, it probably works on Windows.
+`idapm` is IDA Plugin Manager. It works perfectly on macOS, it probably works on Windows and Linux. 
+This is because I only have the macOS version of IDA Pro.
 
 <img src="screenshots/terminal.gif">
 

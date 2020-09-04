@@ -12,6 +12,7 @@ import subprocess
 
 from . import config
 from colorama import Fore
+from os.path import expanduser
 
 
 def get_plugin_dir():
@@ -33,6 +34,15 @@ def get_plugin_dir():
                 ida_root_path = ida_root_list[0]
                 ida_plugins_dir = os.path.join(ida_root_path, 'plugins')
                 return ida_plugins_dir
+    
+    elif platform_name == 'Linux':
+        home_dir = expanduser("~")
+        ida_root_list = glob.glob(os.path.join(home_dir, 'ida*'))
+        ida_root_list = [i for i in ida_root_list if not i.endswith('idapm.json')]
+        if len(ida_root_list) == 1:
+            ida_root_path = ida_root_list[0]
+            ida_plugins_dir = os.path.join(ida_root_path, 'plugins')
+            return ida_plugins_dir
 
     return None
 
@@ -188,6 +198,33 @@ def list_plugins():
             else:
                 for plugin in plugin_repos:
                     print(plugin)
+    
+    elif platform_name == 'Linux':
+        exclude_files = {
+            'bdescr64.so', 'dwarf64.so', 'objc64.so', 'platformthemes', 'tds64.so', 
+            'dbg64.so', 'linux_user64.so', 'platforms', 'plugins.cfg', 'idapm'
+        }
+        home_dir = expanduser("~")
+        ida_root_list = glob.glob(os.path.join(home_dir, 'ida*'))
+        ida_root_list = [i for i in ida_root_list if not i.endswith('idapm.json')]
+        if len(ida_root_list) == 1:
+            ida_root_path = ida_root_list[0]
+            ida_plugins_dir = os.path.join(ida_root_path, 'plugins')
+            added_plugins = set(os.listdir(ida_plugins_dir)) - exclude_files
+            print(Fore.CYAN + 'List of scripts in IDA plugin directory')
+            if len(added_plugins) == 0:
+                print('None')
+            else:
+                for plugin in added_plugins:
+                    print(plugin)
 
+            print(Fore.CYAN + '\nList of plugins in config')
+            c = config.Config()
+            plugin_repos = c.list_plugins()
+            if len(plugin_repos) == 0:
+                print('None')
+            else:
+                for plugin in plugin_repos:
+                    print(plugin)
     else:
         print('Your OS is unsupported...')
