@@ -133,26 +133,14 @@ def list_plugins():
     platform_name = platform.system()
     if platform_name == 'Darwin':
         exclude_files = {
-            'hexarm64.dylib', 'svdimport.dylib', 'dbg.dylib', 'pdb.dylib', 'callee64.dylib',
-            'objc64.dylib', 'pdb64.dylib', 'tds.dylib', 'defs.h', 'mac_stub.dylib', 'idapython3.dylib',
-            'eh_parse64.dylib', 'pin_user64.dylib', 'mac_user64.dylib', 'idapython3_64.dylib',
-            'idapython2_64.dylib', 'mac_user.dylib', 'dscu.dylib', 'eh_parse.dylib', 'swift64.dylib',
-            'uiswitch64.dylib', 'uiswitch.dylib', 'rtti64.dylib', 'comhelper64.dylib', 'unpack64.dylib',
-            'bochs_user.dylib', 'dalvik_user64.dylib', 'plugins.cfg', 'nextfix.dylib', 'tds64.dylib', 'pin_user.dylib',
-            'nextfix64.dylib', 'idapython2.dylib', 'samaout64.dylib', 'dscu64.dylib', 'strings.dylib', 'samaout.dylib',
-            'gdb_user64.dylib', 'mac_stub64.dylib', 'unpack.dylib', 'ios_user64.dylib', 'replay_user.dylib',
-            'makeidt.dylib', 'strings64.dylib', 'objc.dylib', 'hexrays_sdk', 'dbg64.dylib', 'linux_stub.dylib',
-            'xnu_user64.dylib', 'comhelper.dylib', 'dwarf.dylib', 'callee.dylib', 'dalvik_user.dylib', 'bdescr.dylib',
-            'linux_stub64.dylib', 'armlinux_stub.dylib', 'replay_user64.dylib', 'dwarf64.dylib', 'gdb_user.dylib',
-            'bochs_user64.dylib', 'win32_stub64.dylib', 'armlinux_stub64.dylib', 'ios_user.dylib', 'rtti.dylib',
-            'bochs', 'win32_stub.dylib', 'swift.dylib', 'svdimport64.dylib', 'bdescr64.dylib', 'makeidt64.dylib',
-            'idapm'
+            'plugins.cfg', 'hexrays_sdk', 'bochs', 'idapm'
         }
         ida_root_list = glob.glob('/Applications/IDA*')
         if len(ida_root_list) == 1:
             ida_root_path = ida_root_list[0]
             ida_plugins_dir = os.path.join(ida_root_path, 'ida.app/Contents/MacOS/plugins')
             added_plugins = set(os.listdir(ida_plugins_dir)) - exclude_files
+            added_plugins = [i for i in added_plugins if (not i.endswith('.dylib')) and (not i.endswith('.h'))]
             print(Fore.CYAN + 'List of scripts in IDA plugin directory')
             if len(added_plugins) == 0:
                 print('None')
@@ -171,8 +159,7 @@ def list_plugins():
 
     elif platform_name == 'Windows':
         exclude_files = {
-            'bdescr64.dll', 'dbg64.dll', 'dwarf64.dll', 'objc64.dll', 'pdb64.dll', 
-            'plugins.cfg', 'tds64.dll', 'win32_user64.dll', 'idapm'
+            'plugins.cfg', 'idapm'
         }
         ida_dir_list = ['C:\Program Files\IDA*', 'C:\Program Files (x86)\IDA*']
         ida_root_list = []
@@ -183,6 +170,7 @@ def list_plugins():
             ida_root_path = ida_root_list[0]
             ida_plugins_dir = os.path.join(ida_root_path, 'plugins')
             added_plugins = set(os.listdir(ida_plugins_dir)) - exclude_files
+            added_plugins = [i for i in added_plugins if not i.endswith('.dll')]
             print(Fore.CYAN + 'List of scripts in IDA plugin directory')
             if len(added_plugins) == 0:
                 print('None')
@@ -201,8 +189,7 @@ def list_plugins():
     
     elif platform_name == 'Linux':
         exclude_files = {
-            'bdescr64.so', 'dwarf64.so', 'objc64.so', 'platformthemes', 'tds64.so', 
-            'dbg64.so', 'linux_user64.so', 'platforms', 'plugins.cfg', 'idapm'
+            'platformthemes', 'platforms', 'plugins.cfg', 'idapm'
         }
         home_dir = expanduser("~")
         ida_root_list = glob.glob(os.path.join(home_dir, 'ida*'))
@@ -211,6 +198,7 @@ def list_plugins():
             ida_root_path = ida_root_list[0]
             ida_plugins_dir = os.path.join(ida_root_path, 'plugins')
             added_plugins = set(os.listdir(ida_plugins_dir)) - exclude_files
+            added_plugins = [i for i in added_plugins if not i.endswith('.so')]
             print(Fore.CYAN + 'List of scripts in IDA plugin directory')
             if len(added_plugins) == 0:
                 print('None')

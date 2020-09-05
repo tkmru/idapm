@@ -55,19 +55,22 @@ def cmd_install(args):
         installer.install_from_local(args.plugin_name)
     else:
         c = config.Config()
-        if not c.check_duplicate(args.plugin_name):
-            print('----------------------')
-            repo_https_url = 'https://github.com/{0}.git'.format(args.plugin_name)
-            if installer.install_from_github(args.plugin_name, repo_https_url):
-                c.add_plugin(args.plugin_name)
+        if c.check_duplicate(args.plugin_name):
+            print(Fore.RED + '{0} already exists in config'.format(args.plugin_name))
+            input_pattern = {'y': True, 'yes': True, 'n': False, 'no': False}
+            key = input('Do you want to reinstall {0}? [Y/n]: '.format(args.plugin_name)).lower()
+            if not input_pattern[key]:
+                return
 
-            else:
-                repo_ssh_url = 'git@github.com:{0}.git'.format(args.plugin_name)
-                if installer.install_from_github(args.plugin_name, repo_ssh_url):
-                    c.add_plugin(args.plugin_name)
+        print('----------------------')
+        repo_https_url = 'https://github.com/{0}.git'.format(args.plugin_name)
+        if installer.install_from_github(args.plugin_name, repo_https_url):
+            c.add_plugin(args.plugin_name)
 
         else:
-            print(Fore.RED + '{0} already exists'.format(args.plugin_name))
+            repo_ssh_url = 'git@github.com:{0}.git'.format(args.plugin_name)
+            if installer.install_from_github(args.plugin_name, repo_ssh_url):
+                c.add_plugin(args.plugin_name)
 
 
 def cmd_list(args):
