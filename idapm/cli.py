@@ -29,8 +29,8 @@ def cmd_init(args):
 
     else:
         print('~/idapm.json already exists...')
+        input_pattern = {'y': True, 'yes': True, 'n': False, 'no': False}
         while True:
-            input_pattern = {'y': True, 'yes': True, 'n': False, 'no': False}
             try:
                 key = input('Do you want to install a plugin written in ~/idapm.json? [Y/n]: ').lower()
                 if input_pattern[key]:
@@ -38,14 +38,15 @@ def cmd_init(args):
                     for plugin in plugin_repos:
                         print('----------------------')
                         try:
-                            repo_url = 'https://github.com/{0}.git'.format(repo_name)
+                            repo_url = 'https://github.com/{0}.git'.format(plugin)
                             print('Try: git clone {0}'.format(repo_url))
                             installer.install_from_github(plugin, repo_url)
 
                         except:
-                            repo_url = 'git@github.com:{0}.git'.format(repo_name)
+                            repo_url = 'git@github.com:{0}.git'.format(plugin)
                             print('Try: git clone {0}'.format(repo_url))
                             installer.install_from_github(plugin, repo_url)
+
                 break
 
             except:
@@ -60,9 +61,16 @@ def cmd_install(args):
         if c.check_duplicate(args.plugin_name):
             print(Fore.RED + '{0} already exists in config'.format(args.plugin_name))
             input_pattern = {'y': True, 'yes': True, 'n': False, 'no': False}
-            key = input('Do you want to reinstall {0}? [Y/n]: '.format(args.plugin_name)).lower()
-            if not input_pattern[key]:
-                return
+            while True:
+                try:
+                    key = input('Do you want to reinstall {0}? [Y/n]: '.format(args.plugin_name)).lower()
+                    if not input_pattern[key]:
+                        return
+                    else:
+                        break
+
+                except:
+                    pass
 
         print('----------------------')
         repo_https_url = 'https://github.com/{0}.git'.format(args.plugin_name)

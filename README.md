@@ -35,6 +35,7 @@ $ idapm init
 ~/idapm.json already exists...
 Do you want to install a plugin written in ~/idapm.json? [Y/n]: y
 ----------------------
+Try: git clone https://github.com/L4ys/LazyIDA.git
 Cloning into '/Applications/IDA Pro 7.5/ida.app/Contents/MacOS/plugins/idapm/L4ys/LazyIDA'...
 Symbolic link(/Applications/IDA Pro 7.5/ida.app/Contents/MacOS/plugins/LazyIDA.py) has been created
 Installed successfully!
@@ -51,6 +52,7 @@ You can install from the specified GitHub repository.
 ```
 $ idapm install L4ys/LazyIDA
 ----------------------
+Try: git clone https://github.com/L4ys/LazyIDA.git
 Cloning into '/Applications/IDA Pro 7.5/ida.app/Contents/MacOS/plugins/idapm/L4ys/LazyIDA'...
 Symbolic link(/Applications/IDA Pro 7.5/ida.app/Contents/MacOS/plugins/LazyIDA.py) has been created.
 Installed successfully!
