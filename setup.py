@@ -6,7 +6,7 @@ import idapm
 
 setup(
     name="idapm",
-    version="0.0.1",
+    version="0.1.0",
     description="IDA Plugin Manager",
     author="tkmru",
     packages=['idapm'],

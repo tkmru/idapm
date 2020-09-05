@@ -99,7 +99,7 @@ def install_from_github(repo_name, repo_url):
         if (errs is not None) and (len(errs) != 0):
             msg = errs.decode('ascii').replace('\n', '')
             print(msg)
-            if 'Repository not found' in msg:
+            if ('Repository not found' in msg) or ('already exists and is not an empty directory' in msg):
                 return False
 
         py_file_list = glob.glob(os.path.join(installed_path, '**/*.py'), recursive=True)

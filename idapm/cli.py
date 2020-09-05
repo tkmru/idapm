@@ -39,10 +39,12 @@ def cmd_init(args):
                         print('----------------------')
                         try:
                             repo_url = 'https://github.com/{0}.git'.format(repo_name)
+                            print('Try: git clone {0}'.format(repo_url))
                             installer.install_from_github(plugin, repo_url)
 
                         except:
                             repo_url = 'git@github.com:{0}.git'.format(repo_name)
+                            print('Try: git clone {0}'.format(repo_url))
                             installer.install_from_github(plugin, repo_url)
                 break
 
@@ -64,11 +66,13 @@ def cmd_install(args):
 
         print('----------------------')
         repo_https_url = 'https://github.com/{0}.git'.format(args.plugin_name)
+        print('Try: git clone {0}'.format(repo_https_url))
         if installer.install_from_github(args.plugin_name, repo_https_url):
             c.add_plugin(args.plugin_name)
 
         else:
             repo_ssh_url = 'git@github.com:{0}.git'.format(args.plugin_name)
+            print('Try: git clone {0}'.format(repo_ssh_url))
             if installer.install_from_github(args.plugin_name, repo_ssh_url):
                 c.add_plugin(args.plugin_name)
 
